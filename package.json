@@ -1,0 +1,16 @@
+{
+  "name": "glint",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently -n \"WEB,API\" -c \"bgBlue.bold,bgMagenta.bold\" \"pnpm --filter web start\" \"pnpm --filter api start:dev\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.23.0",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
