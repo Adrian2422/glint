@@ -1,0 +1,3 @@
+### Get posts filtered by search string
+GET {{baseUrl}}filtered-posts/hello
+Accept: application/json

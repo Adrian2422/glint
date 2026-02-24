@@ -1,0 +1,3 @@
+### Publish a post by ID
+PUT {{baseUrl}}publish/1
+Accept: application/json
