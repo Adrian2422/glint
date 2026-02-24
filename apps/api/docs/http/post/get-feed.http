@@ -1,0 +1,3 @@
+### Get published posts (feed)
+GET {{baseUrl}}/feed
+Accept: application/json

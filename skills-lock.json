@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "zenstack": {
+      "source": "beshkenadze/claude-skills-marketplace",
+      "sourceType": "github",
+      "computedHash": "0924e2c76dc574a5efec7b28b24282dd0a2d49598ef7f3c3224f5e68c3411149"
+    }
+  }
+}

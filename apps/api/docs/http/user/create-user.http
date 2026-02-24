@@ -1,0 +1,9 @@
+### Sign up a user
+POST {{baseUrl}}user
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Alice",
+  "email": "alice@example.com"
+}

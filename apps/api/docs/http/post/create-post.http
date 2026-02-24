@@ -1,0 +1,10 @@
+### Create a draft post
+POST {{baseUrl}}post
+Content-Type: application/json
+Accept: application/json
+
+{
+  "title": "My first post",
+  "content": "Hello world",
+  "authorEmail": "alice@example.com"
+}
