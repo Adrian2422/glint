@@ -1,3 +1,0 @@
-### Get a post by ID
-GET {{baseUrl}}post/1
-Accept: application/json

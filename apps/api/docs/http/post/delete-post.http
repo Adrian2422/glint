@@ -1,3 +1,0 @@
-### Delete a post by ID
-DELETE {{baseUrl}}post/1
-Accept: application/json
