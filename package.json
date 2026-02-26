@@ -2,15 +2,20 @@
   "name": "glint",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "type": "module",
   "scripts": {
-    "dev": "concurrently -n \"WEB,API\" -c \"bgBlue.bold,bgMagenta.bold\" \"pnpm --filter web start\" \"pnpm --filter api start:dev\""
+    "dev": "concurrently -n \"WEB,API\" -c \"bgBlue.bold,bgMagenta.bold\" \"pnpm --filter web start\" \"pnpm --filter api start:dev\"",
+    "test": "concurrently -n \"WEB,API\" -c \"bgBlue.bold,bgMagenta.bold\" \"pnpm --filter web test\" \"pnpm --filter api test\"",
+    "prepare": "husky"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.23.0",
   "devDependencies": {
-    "concurrently": "^9.2.1"
+    "@commitlint/cli": "^20.4.2",
+    "@commitlint/config-conventional": "^20.4.2",
+    "concurrently": "^9.2.1",
+    "husky": "^9.1.7"
   }
 }

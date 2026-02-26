@@ -1,22 +1,23 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { describe, it, expect, beforeEach } from 'vitest';
+import { TestBed, type Mocked } from '@suites/unit';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { PostService } from './post.service';
+import { UserService } from './user.service';
 
 describe('AppController', () => {
   let appController: AppController;
+  let postService: Mocked<PostService>;
+  let userService: Mocked<UserService>;
 
   beforeEach(async () => {
-    const app: TestingModule = await Test.createTestingModule({
-      controllers: [AppController],
-      providers: [AppService],
-    }).compile();
+    const { unit, unitRef } = await TestBed.solitary(AppController).compile();
 
-    appController = app.get<AppController>(AppController);
+    appController = unit;
+    postService = unitRef.get(PostService);
+    userService = unitRef.get(UserService);
   });
 
-  describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
-    });
+  it('should be defined', () => {
+    expect(appController).toBeDefined();
   });
 });
