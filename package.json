@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently -n \"WEB,API\" -c \"bgBlue.bold,bgMagenta.bold\" \"pnpm --filter web start\" \"pnpm --filter api start:dev\"",
+    "lint": "concurrently -n \"WEB,API\" -c \"bgBlue.bold,bgMagenta.bold\" \"pnpm --filter web lint\" \"pnpm --filter api lint\"",
     "test": "concurrently -n \"WEB,API\" -c \"bgBlue.bold,bgMagenta.bold\" \"pnpm --filter web test\" \"pnpm --filter api test\"",
     "prepare": "husky"
   },

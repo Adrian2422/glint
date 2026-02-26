@@ -5,7 +5,33 @@
 
 /* eslint-disable */
 
-import { type SchemaType as $Schema } from "./schema";
+import { schema as $schema, type SchemaType as $Schema } from "./schema";
 import { type ModelResult as $ModelResult } from "@zenstackhq/orm";
+/**
+ * Użytkownik systemu - może należeć do wielu tenantów
+ */
 export type User = $ModelResult<$Schema, "User">;
-export type Post = $ModelResult<$Schema, "Post">;
+/**
+ * Organizacja (tenant) - izolacja danych
+ */
+export type Tenant = $ModelResult<$Schema, "Tenant">;
+/**
+ * Członkostwo użytkownika w tenancie z przypisaną rolą
+ */
+export type TenantMembership = $ModelResult<$Schema, "TenantMembership">;
+/**
+ * Sesja użytkownika (opcjonalne, dla zarządzania tokenami)
+ */
+export type Session = $ModelResult<$Schema, "Session">;
+/**
+ * Zaproszenie do tenanta (opcjonalne dla MVP)
+ */
+export type TenantInvitation = $ModelResult<$Schema, "TenantInvitation">;
+/**
+ * Enum ról w systemie (RBAC)
+ */
+export const Role = $schema.enums.Role.values;
+/**
+ * Enum ról w systemie (RBAC)
+ */
+export type Role = (typeof Role)[keyof typeof Role];
