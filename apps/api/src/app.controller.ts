@@ -18,6 +18,11 @@ export class AppController {
     private readonly postService: PostService,
   ) {}
 
+  @Get()
+  getHello(): string {
+    return 'Hello World!';
+  }
+
   @Get('post/:id')
   async getPostById(@Param('id') id: string): Promise<PostModel | null> {
     return await this.postService.post({
