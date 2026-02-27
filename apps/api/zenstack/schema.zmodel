@@ -3,18 +3,137 @@ datasource db {
     url = env("DATABASE_URL")
 }
 
-model User {
-    id    Int     @id @default(autoincrement())
-    email String  @unique
-    name  String?
-    posts Post[]
+plugin policy {
+    provider = "@zenstackhq/plugin-policy"
 }
 
-model Post {
-    id        Int      @id @default(autoincrement())
-    title     String
-    content   String?
-    published Boolean? @default(false)
-    author    User?    @relation(fields: [authorId], references: [id])
-    authorId  Int?
+// ============================================================================
+// IDENTITY & ACCESS MANAGEMENT
+// ============================================================================
+
+/// Użytkownik systemu - może należeć do wielu tenantów
+model User {
+    id          String             @id @default(uuid())
+    email       String             @unique
+    password    String             @omit
+    firstName   String?
+    lastName    String?
+    isActive    Boolean            @default(true)
+
+    createdAt   DateTime           @default(now())
+    updatedAt   DateTime           @updatedAt
+  
+    // Relations
+    memberships TenantMembership[]
+    sessions    Session[]
+
+    // Permissions
+    @@allow('read', auth().id == id)
+    @@allow('create', true)
+    @@allow('update', auth().id == id)
+    @@allow('delete', auth().id == id)
+
+    @@map("users")
+}
+
+/// Organizacja (tenant) - izolacja danych
+model Tenant {
+    id          String             @id @default(uuid())
+    name        String
+    slug        String             @unique // dla URL-friendly identyfikacji
+    isActive    Boolean            @default(true)
+
+    createdAt   DateTime           @default(now())
+    updatedAt   DateTime           @updatedAt
+  
+    // Relations
+    memberships TenantMembership[]
+
+    // Permissions
+    @@allow('read', memberships?[userId == auth().id])
+    @@allow('update,delete', memberships?[userId == auth().id && role == OWNER])
+    @@allow('create', true) // Dla MVP pozwalamy tworzyć tenanty każdemu zalogowanemu (można to później ograniczyć)
+
+    @@map("tenants")
+}
+
+/// Członkostwo użytkownika w tenancie z przypisaną rolą
+model TenantMembership {
+    id        String   @id @default(uuid())
+    userId    String
+    tenantId  String
+    role      Role
+
+    isActive  Boolean  @default(true)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+  
+    // Relations
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+    // Permissions
+    @@allow('read', userId == auth().id || tenant.memberships?[userId == auth().id && (role == OWNER || role == ADMIN)])
+    @@allow('create', true) // Pozwalamy na tworzenie (np. przy dołączaniu/zapraszaniu), logika biznesowa w serwisie sprawdzi uprawnienia
+    @@allow('update', tenant.memberships?[userId == auth().id && (role == OWNER || role == ADMIN)])
+    @@allow('delete', tenant.memberships?[userId == auth().id && role == OWNER])
+
+    @@unique([userId, tenantId])
+    @@index([userId])
+    @@index([tenantId])
+    @@map("tenant_memberships")
+}
+
+/// Enum ról w systemie (RBAC)
+enum Role {
+    OWNER   // Właściciel tenanta - pełne uprawnienia
+    ADMIN   // Administrator - zarządzanie użytkownikami i ankietami
+    CREATOR // Twórca - tworzenie i edycja ankiet
+    ANALYST // Analityk - tylko odczyt i analiza wyników
+
+    @@map("role")
+}
+
+/// Sesja użytkownika (opcjonalne, dla zarządzania tokenami)
+model Session {
+    id               String   @id @default(uuid())
+    userId           String
+    activeTenantId   String?  // aktywny tenant w tej sesji
+    refreshToken     String   @unique
+    refreshTokenHash String   // zahashowany dla bezpieczeństwa
+    expiresAt        DateTime
+    lastActivityAt   DateTime @default(now())
+
+    ipAddress        String?
+    userAgent        String?
+
+    createdAt        DateTime @default(now())
+  
+    // Relations
+    user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
+    @@index([refreshToken])
+    @@index([expiresAt])
+    @@map("sessions")
+}
+
+/// Zaproszenie do tenanta (opcjonalne dla MVP)
+model TenantInvitation {
+    id         String    @id @default(uuid())
+    tenantId   String
+    email      String
+    role       Role
+    token      String    @unique
+    expiresAt  DateTime
+
+    acceptedAt DateTime?
+    invitedBy  String    // userId
+
+    createdAt  DateTime  @default(now())
+
+    @@index([email])
+    @@index([token])
+    @@index([expiresAt])
+    @@map("tenant_invitations")
 }
