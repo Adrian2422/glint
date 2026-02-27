@@ -7,12 +7,13 @@ import {
 } from './interfaces/auth-provider.interface';
 import { UserCreateArgs } from '../../../zenstack/input';
 import { User } from '../../../zenstack/models';
+import { AUTH_PROVIDER } from './constants/auth-provider.const';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
-    @Inject('IAuthProvider') private readonly authProvider: IAuthProvider,
+    @Inject(AUTH_PROVIDER) private readonly authProvider: IAuthProvider,
   ) {}
 
   async register(data: UserCreateArgs['data']) {

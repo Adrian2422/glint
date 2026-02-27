@@ -1,4 +1,5 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from '../../users/users.service';
@@ -18,6 +19,7 @@ export class LocalAuthProvider implements IAuthProvider {
     private readonly usersService: UsersService,
     private readonly sessionsService: SessionsService,
     private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
   ) {}
 
   async authenticate(email: string, pass: string): Promise<AuthResponse> {
@@ -137,13 +139,18 @@ export class LocalAuthProvider implements IAuthProvider {
     const refreshToken = Math.random().toString(36).substring(2) + Date.now();
     const refreshTokenHash = await bcrypt.hash(refreshToken, 10);
 
+    const refreshTokenTtl = this.configService.get<number>(
+      'JWT_REFRESH_TOKEN_TTL',
+      1000 * 60 * 60,
+    );
+
     await this.sessionsService.create({
       data: {
         userId: user.id,
         refreshToken,
         refreshTokenHash,
         activeTenantId,
-        expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24), // 1 day
+        expiresAt: new Date(Date.now() + Number(refreshTokenTtl)),
       },
     });
 
