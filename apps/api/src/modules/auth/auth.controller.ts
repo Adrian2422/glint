@@ -20,7 +20,6 @@ export class AuthController {
     return this.authService.login(body.email, body.password);
   }
 
-  @Public()
   @Post('logout')
   async logout(@Body('refreshToken') refreshToken: string) {
     return this.authService.logout(refreshToken);
