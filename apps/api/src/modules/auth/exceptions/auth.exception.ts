@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { AuthErrorCode } from '../enums/auth-error-codes.enum';
+import { AuthErrorCode } from '@glint/shared';
 
 export class AuthException extends HttpException {
   constructor(

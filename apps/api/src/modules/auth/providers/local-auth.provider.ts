@@ -13,7 +13,7 @@ import { User } from '../../../../zenstack/models';
 import { UserWithMemberships } from '../../../common/types/user-with-memberships.type';
 import { SessionWithUserMemberships } from '../../../common/types/session-with-user-memberships.type';
 import { AuthException } from '../exceptions/auth.exception';
-import { AuthErrorCode } from '../enums/auth-error-codes.enum';
+import { AuthErrorCode } from '@glint/shared';
 
 @Injectable()
 export class LocalAuthProvider implements IAuthProvider {

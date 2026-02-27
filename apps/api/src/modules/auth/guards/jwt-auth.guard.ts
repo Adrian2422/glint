@@ -4,7 +4,7 @@ import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 import { JwtPayload } from '../interfaces/auth-provider.interface';
 import { AuthException } from '../exceptions/auth.exception';
-import { AuthErrorCode } from '../enums/auth-error-codes.enum';
+import { AuthErrorCode } from '@glint/shared';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
