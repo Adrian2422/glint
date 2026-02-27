@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -12,6 +12,8 @@ import {
 import { User } from '../../../../zenstack/models';
 import { UserWithMemberships } from '../../../common/types/user-with-memberships.type';
 import { SessionWithUserMemberships } from '../../../common/types/session-with-user-memberships.type';
+import { AuthException } from '../exceptions/auth.exception';
+import { AuthErrorCode } from '../enums/auth-error-codes.enum';
 
 @Injectable()
 export class LocalAuthProvider implements IAuthProvider {
@@ -35,7 +37,10 @@ export class LocalAuthProvider implements IAuthProvider {
     })) as UserWithMemberships | null;
 
     if (!user || !(await bcrypt.compare(pass, user.password))) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new AuthException(
+        AuthErrorCode.INVALID_CREDENTIALS,
+        'Invalid credentials',
+      );
     }
 
     const activeTenantId = user.memberships?.[0]?.tenantId;
@@ -60,12 +65,15 @@ export class LocalAuthProvider implements IAuthProvider {
     })) as SessionWithUserMemberships | null;
 
     if (!session) {
-      throw new UnauthorizedException('Session not found');
+      throw new AuthException(
+        AuthErrorCode.SESSION_NOT_FOUND,
+        'Session not found',
+      );
     }
 
     if (session.expiresAt < new Date()) {
       await this.sessionsService.delete({ where: { id: session.id } });
-      throw new UnauthorizedException('Session expired');
+      throw new AuthException(AuthErrorCode.SESSION_EXPIRED, 'Session expired');
     }
 
     const isValid = await bcrypt.compare(
@@ -75,7 +83,10 @@ export class LocalAuthProvider implements IAuthProvider {
 
     if (!isValid) {
       await this.sessionsService.delete({ where: { id: session.id } });
-      throw new UnauthorizedException('Invalid refresh token');
+      throw new AuthException(
+        AuthErrorCode.INVALID_REFRESH_TOKEN,
+        'Invalid refresh token',
+      );
     }
 
     const activeTenantId =

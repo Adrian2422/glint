@@ -1,13 +1,10 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 import { JwtPayload } from '../interfaces/auth-provider.interface';
+import { AuthException } from '../exceptions/auth.exception';
+import { AuthErrorCode } from '../enums/auth-error-codes.enum';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
@@ -28,13 +25,16 @@ export class JwtAuthGuard implements CanActivate {
     const request: Request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
     if (!token) {
-      throw new UnauthorizedException();
+      throw new AuthException(AuthErrorCode.JWT_INVALID, 'JWT token not found');
     }
     try {
       const payload: JwtPayload = await this.jwtService.verifyAsync(token);
       request['user'] = payload;
     } catch {
-      throw new UnauthorizedException();
+      throw new AuthException(
+        AuthErrorCode.UNAUTHORIZED,
+        'JWT verification failed',
+      );
     }
     return true;
   }
